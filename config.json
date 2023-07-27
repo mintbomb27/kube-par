@@ -1,0 +1,26 @@
+{
+    "name":"Array Adding Workflow",
+    "slaves":[
+        {
+            "id":"kjkhfqej",
+            "name":"slave 1",
+            "endpoint":""
+        }
+    ],
+    "steps": [
+        {
+            "type":"startall",
+            "params":{}
+        },
+        {
+            "type":"pause",
+            "params":{
+                "id":"kjkhfqej"
+            }
+        },
+        {
+            "type":"startall",
+            "params":{}
+        }
+    ]
+}

@@ -1,0 +1,106 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: master-api
+spec:
+  selector:
+    app: master
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 5000
+  type: ClusterIP
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: slave-1-api
+spec:
+  selector:
+    app: slave-1
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 5000
+  type: ClusterIP
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: slave-2-api
+spec:
+  selector:
+    app: slave-2
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 5000
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: master
+  labels:
+    app: master
+spec:
+  containers:
+  - name: master
+    image: vaishsab/kubepar-master:v1.0.0
+    ports:
+    - containerPort: 5000
+    env:
+    - name: SLAVE_NUMBERS
+      value: '2'
+    - name: SLAVE_1_API_URL
+      value: http://slave-1-api:80
+    - name: SLAVE_2_API_URL
+      value: http://slave-2-api:80
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: slave-1
+  labels:
+    app: slave
+spec:
+  containers:
+  - name: slave-1
+    image: vaishsab/kubepar-slave:v1.0.0
+    ports:
+    - containerPort: 5000
+    env:
+    - name: MASTER_API_URL
+      value: http://master-api:80/
+    - name: SLAVE_ID
+      value: SLAVE_2
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: slave-2
+  labels:
+    app: slave
+spec:
+  containers:
+  - name: slave-2
+    image: vaishsab/kubepar-slave:v1.0.0
+    ports:
+    - containerPort: 5000
+    env:
+    - name: MASTER_API_URL
+      value: http://master-api:80
+    - name: SLAVE_ID
+      value: SLAVE_2
